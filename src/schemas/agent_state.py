@@ -48,6 +48,7 @@ class AgentState(BaseModel):
     analyst_sources: List[str] = Field(default_factory=list)
 
     # News agent output
+    material_news_count: int = 0
     news_items: List[NewsItem] = Field(default_factory=list)
     overall_news_sentiment: float = 0.0
 
