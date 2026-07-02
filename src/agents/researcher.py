@@ -23,37 +23,48 @@ class ResearcherAgent:
 
     def fetch_filing(self, ticker: str) -> str:
         headers = {"User-Agent": os.getenv("SEC_USER_AGENT")}
-        
+
         # Step 1: get CIK from ticker
         tickers_url = "https://www.sec.gov/files/company_tickers.json"
         response = requests.get(tickers_url, headers=headers)
         tickers_data = response.json()
-        
+
         cik = None
         for entry in tickers_data.values():
             if entry['ticker'].upper() == ticker.upper():
                 cik = str(entry['cik_str']).zfill(10)
                 break
-        
+
         if not cik:
             return None
-        
+
         # Step 2: get latest 10-K accession number
         submissions_url = f"https://data.sec.gov/submissions/CIK{cik}.json"
         response = requests.get(submissions_url, headers=headers)
         data = response.json()
-        
+
         forms = data['filings']['recent']['form']
         accessions = data['filings']['recent']['accessionNumber']
-        
+
         for i, form in enumerate(forms):
             if form == '10-K':
-                accession = accessions[i].replace('-', '')
+                accession = accessions[i]
+                accession_nodash = accession.replace('-', '')
                 cik_short = str(int(cik))
-                return f"https://www.sec.gov/Archives/edgar/full-index/{cik_short}/{accession}/"
-        
+                return f"https://www.sec.gov/Archives/edgar/data/{cik_short}/{accession_nodash}/{accession}.txt"
+
         return None
     
+
+    def download_filing_text(self, filing_url: str) -> str:
+        headers = {"User-Agent": os.getenv("SEC_USER_AGENT")}
+        response = requests.get(filing_url, headers=headers)
+        
+        if response.status_code != 200:
+            return None
+            
+        return response.text
+
 
     def chunk_and_index(self, text: str, ticker: str) -> int:
         words = text.split()
