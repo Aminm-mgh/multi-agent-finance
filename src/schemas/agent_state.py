@@ -45,6 +45,7 @@ class AgentState(BaseModel):
     # Analyst output
     financial_metrics: Optional[FinancialMetrics] = None
     analyst_summary: str = ""
+    analyst_sources: List[str] = Field(default_factory=list)
 
     # News agent output
     news_items: List[NewsItem] = Field(default_factory=list)
