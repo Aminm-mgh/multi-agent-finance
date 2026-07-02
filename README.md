@@ -50,6 +50,9 @@ The full pipeline is 41.8x slower but retrieves 947 grounded chunks from the rea
 ---
 
 ## Project Structure
+
+
+
 multi-agent-finance/
 ├── src/
 │   ├── agents/          ← researcher, analyst, news_agent, critic
@@ -62,6 +65,7 @@ multi-agent-finance/
 ├── data/                ← cached filings (gitignored)
 ├── reports/             ← JSON audit trail per run
 └── tests/               ← pytest test suite
+
 
 
 ---
