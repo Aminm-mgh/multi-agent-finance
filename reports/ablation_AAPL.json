@@ -1,0 +1,20 @@
+{
+  "single": {
+    "mode": "single_agent",
+    "ticker": "AAPL",
+    "analyst_summary": "P/E ratio: 37.19 | Debt/Equity: 79.55 | Revenue growth YoY: 16.6% | Gross margin: 47.9% | Market cap: $4517.5B",
+    "confidence_score": 0.0,
+    "errors": [],
+    "latency_ms": 449.80931282043457
+  },
+  "full": {
+    "mode": "full_pipeline",
+    "ticker": "AAPL",
+    "analyst_summary": "P/E ratio: 37.19 | Debt/Equity: 79.55 | Revenue growth YoY: 16.6% | Gross margin: 47.9% | Market cap: $4517.4B",
+    "confidence_score": 0.2,
+    "critique_summary": "The financial metrics presented cannot be meaningfully validated against the provided SEC filing chunks, as those excerpts consist almost entirely of XBRL taxonomy markup, boilerplate debt covenant language, and metadata rather than actual financial statements. Several metrics raise immediate red flags, particularly the $4,517B market cap which appears materially overstated by roughly 50% versus known AAPL trading ranges, and the 16.6% revenue growth figure which is inconsistent with Apple's recently reported low-to-flat growth trajectory. The near-neutral news sentiment score of 0.3 across only 10 articles provides insufficient corroborating market context, and the absence of verifiable primary source data in the filing chunks makes it impossible to confirm the gross margin, P/E, or debt figures with any reasonable confidence.",
+    "errors": [],
+    "latency_ms": 18803.97319793701,
+    "chunks_retrieved": 947
+  }
+}
