@@ -87,20 +87,34 @@ class ResearcherAgent:
     def run(self, state: AgentState) -> AgentState:
         import time
         start = time.time()
-        
+
         try:
+            # Step 1: fetch filing URL
             filing_url = self.fetch_filing(state.ticker)
-            
+
             if not filing_url:
                 state.errors.append(f"Researcher: could not find 10-K for {state.ticker}")
                 state.filing_retrieval_success = False
                 return state
-            
+
+            # Step 2: download the text
+            text = self.download_filing_text(filing_url)
+
+            if not text:
+                state.errors.append(f"Researcher: could not download filing from {filing_url}")
+                state.filing_retrieval_success = False
+                return state
+
+            # Step 3: chunk and index into RAG
+            num_chunks = self.chunk_and_index(text, state.ticker)
+            state.total_chunks_retrieved = num_chunks
+
+            # Step 4: search for the most relevant chunks
             results = self.hybrid_search.search(
                 "risk factors revenue income debt financial highlights",
                 n_results=10
             )
-            
+
             for r in results:
                 chunk = RetrievedChunk(
                     text=r['text'],
@@ -110,12 +124,12 @@ class ResearcherAgent:
                     relevance_score=0.9
                 )
                 state.filing_chunks.append(chunk)
-            
+
             state.filing_retrieval_success = True
-            
+
         except Exception as e:
             state.errors.append(f"Researcher error: {str(e)}")
             state.filing_retrieval_success = False
-        
+
         state.agent_latencies_ms['researcher'] = (time.time() - start) * 1000
         return state

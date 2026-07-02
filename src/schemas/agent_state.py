@@ -56,5 +56,6 @@ class AgentState(BaseModel):
     critique_summary: str = ""
 
     # Pipeline metadata
+    total_chunks_retrieved: int = 0
     errors: List[str] = Field(default_factory=list)
     agent_latencies_ms: dict = Field(default_factory=dict)
