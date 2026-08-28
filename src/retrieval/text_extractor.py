@@ -2,32 +2,24 @@ import re
 
 class TextExtractor:
     def extract_narrative(self, raw_text: str) -> str:
-        # Remove XBRL/XML blocks
+        # Remove all XML/HTML tags
         text = re.sub(r'<[^>]+>', ' ', raw_text)
         
-        # Remove lines that look like XBRL metadata
-        lines = text.split('\n')
-        clean_lines = []
+        # Remove lines with XBRL/technical patterns
+        lines = text.split()
         
-        for line in lines:
-            line = line.strip()
-            
-            # Skip empty lines
-            if not line:
+        # Rebuild into sentences by joining words
+        # Filter out tokens that are clearly not narrative
+        clean_words = []
+        for word in lines:
+            # Skip XBRL namespaces and URLs
+            if 'http' in word or 'xbrl' in word.lower() or 'fasb.org' in word:
                 continue
-            
-            # Skip lines that are mostly symbols or codes
-            if len(re.findall(r'[a-zA-Z\s]', line)) < len(line) * 0.5:
+            # Skip pure numbers longer than 10 digits
+            if re.match(r'^\d{10,}$', word):
                 continue
-            
-            # Skip very short lines
-            if len(line) < 30:
-                continue
-            
-            # Skip lines with XBRL patterns
-            if any(pattern in line for pattern in ['xbrltype', 'nsuri', 'localname', 'auth_ref', 'gaap_', 'us-gaap']):
-                continue
-                
-            clean_lines.append(line)
+            clean_words.append(word)
         
-        return '\n'.join(clean_lines)
+        # Join into text and split into chunks by period
+        full_text = ' '.join(clean_words)
+        return full_text

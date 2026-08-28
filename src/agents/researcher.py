@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from src.retrieval.hybrid_search import HybridSearch
 from src.schemas.agent_state import AgentState, RetrievedChunk
+from src.retrieval.text_extractor import TextExtractor
+import time as t
 
 load_dotenv()
 
@@ -20,6 +22,9 @@ SEC_HEADERS = {
 class ResearcherAgent:
     def __init__(self):
         self.hybrid_search = HybridSearch()
+        self.extractor = TextExtractor()
+
+    
 
     def fetch_filing(self, ticker: str) -> str:
         headers = {"User-Agent": os.getenv("SEC_USER_AGENT")}
@@ -51,8 +56,23 @@ class ResearcherAgent:
                 accession = accessions[i]
                 accession_nodash = accession.replace('-', '')
                 cik_short = str(int(cik))
+                ticker_lower = ticker.lower()
+                
+                # Get the filing index to find the .htm file
+                index_url = f"https://www.sec.gov/Archives/edgar/data/{cik_short}/{accession_nodash}/{accession}-index.htm"
+                idx_response = requests.get(index_url, headers=headers)
+                
+                # Find the main htm file (ticker-date.htm pattern)
+                import re
+                htm_match = re.search(rf'{ticker_lower}-\d+\.htm', idx_response.text, re.IGNORECASE)
+                if htm_match:
+                    htm_file = htm_match.group(0)
+                    return f"https://www.sec.gov/Archives/edgar/data/{cik_short}/{accession_nodash}/{htm_file}"
+                
+                # Fallback to txt
                 return f"https://www.sec.gov/Archives/edgar/data/{cik_short}/{accession_nodash}/{accession}.txt"
 
+        
         return None
     
 
@@ -78,8 +98,9 @@ class ResearcherAgent:
                 chunks.append(chunk)
         
         metadatas = [{"source": f"{ticker}_10K", "section": "filing", "page": i+1} for i in range(len(chunks))]
-        ids = [f"{ticker}_chunk_{i}" for i in range(len(chunks))]
-        
+        run_ts = int(t.time())
+        ids = [f"{ticker}_chunk_{run_ts}_{i}" for i in range(len(chunks))]
+
         self.hybrid_search.add_chunks(chunks, metadatas, ids)
         return len(chunks)
     
@@ -105,9 +126,9 @@ class ResearcherAgent:
                 state.filing_retrieval_success = False
                 return state
 
-            # Step 3: chunk and index into RAG
-            num_chunks = self.chunk_and_index(text, state.ticker)
-            state.total_chunks_retrieved = num_chunks
+            # Step 3: clean text then chunk and index into RAG
+            clean_text = self.extractor.extract_narrative(text)
+            num_chunks = self.chunk_and_index(clean_text, state.ticker)
 
             # Step 4: search for the most relevant chunks
             results = self.hybrid_search.search(
