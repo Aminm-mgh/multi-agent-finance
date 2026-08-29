@@ -21,6 +21,11 @@ class VectorStore:
             ids=ids
         )
 
+    def clear_collection(self):
+        self.client.delete_collection(self.collection.name)
+        self.collection = self.client.get_or_create_collection(
+            name=self.collection.name
+        )
 
     def search(self, query: str, n_results: int = 5) -> dict:
         query_embedding = self.embedder.embed([query])

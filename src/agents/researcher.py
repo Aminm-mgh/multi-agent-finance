@@ -110,6 +110,10 @@ class ResearcherAgent:
         start = time.time()
 
         try:
+
+            # Clear old chunks before adding new ones
+            self.hybrid_search.vector_store.clear_collection()
+            
             # Step 1: fetch filing URL
             filing_url = self.fetch_filing(state.ticker)
 
