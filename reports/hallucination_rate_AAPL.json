@@ -1,0 +1,19 @@
+{
+  "ticker": "AAPL",
+  "total_claims": 10,
+  "grounded_claims": 0,
+  "ungrounded_claims": [
+    "48.7",
+    "36.70",
+    "$4665.8B",
+    "4,665.8",
+    "16.4",
+    "78.44",
+    "$4,665.8B",
+    "16.4%",
+    "4665.8",
+    "48.7%"
+  ],
+  "hallucination_rate": 1.0,
+  "grounding_rate": 0.0
+}
