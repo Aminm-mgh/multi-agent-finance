@@ -38,14 +38,20 @@ Four specialised agents orchestrated by LangGraph:
 
 ---
 
-## Key Results (Ablation Study — AAPL)
+## Key Results (Ablation Study)
 
 | Mode | Latency | Chunks Retrieved | Confidence Score |
 |------|---------|-----------------|-----------------|
 | Single agent (Analyst only) | 450ms | 0 | N/A |
-| Full 4-agent pipeline | 18,804ms | 947 | 20% |
+| Full 4-agent pipeline | 18,804ms | 947 | 0.20 → 0.42 after RAG fix |
 
-The full pipeline is 41.8x slower but retrieves 947 grounded chunks from the real SEC filing and produces a confidence score with critique flags — capabilities the single agent cannot provide.
+## Multi-Ticker Results
+
+| Ticker | P/E | Revenue Growth | Gross Margin | Market Cap | Confidence |
+|--------|-----|----------------|--------------|------------|------------|
+| AAPL | 36.70 | 16.4% | 48.7% | $4,665B | 0.42 |
+| MSFT | 28.17 | 17.7% | 67.9% | $3,813B | 0.51 |
+| TSLA | 322.92 | 25.5% | 18.9% | $1,377B | 0.38 |
 
 ---
 
